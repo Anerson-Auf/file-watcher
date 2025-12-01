@@ -31,7 +31,7 @@ cargo run watch -p .
 cargo run watch -p D:/vids/test.mp4
 
 # Watch with detailed events
-cargo run watch -p ./src 
+cargo run watch -p ./src -d
 ```
 
 ## Installation
