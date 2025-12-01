@@ -1,8 +1,8 @@
 use walkdir::WalkDir;
 use std::path::PathBuf;
-use notify_debouncer_mini::{DebouncedEvent as DebouncedEventMini, DebouncedEventKind, Debouncer, new_debouncer, notify::*};
-use notify_debouncer_full::{new_debouncer as new_debouncer_full, DebouncedEvent as DebouncedEventFull, DebounceEventResult};
-use notify::RecommendedWatcher;
+use notify_debouncer_mini::{DebouncedEvent as DebouncedEventMini, Debouncer, new_debouncer, notify::*};
+use notify_debouncer_full::{new_debouncer as new_debouncer_full, DebounceEventResult};
+use notify::{RecommendedWatcher};
 use std::sync::mpsc::Receiver;
 use tracing::{info, error};
 
@@ -15,6 +15,14 @@ pub struct Watcher {
 impl Watcher {
     pub async fn new(path: String, detailed: bool) -> anyhow::Result<Self> {
         let path = PathBuf::from(path);
+        
+        if !path.exists() {
+            anyhow::bail!("Path does not exist: {}", path.display());
+        }
+        
+        if !path.is_file() && !path.is_dir() {
+            anyhow::bail!("Path is neither a file nor a directory: {}", path.display());
+        }
         
         if detailed {
             let (tx, rx) = std::sync::mpsc::channel();
@@ -46,50 +54,6 @@ impl Watcher {
                 event_receiver_full: None,
             })
         }
-    }
-    fn handle_event_mini(event: DebouncedEventMini) -> anyhow::Result<()> {
-        match event.kind {
-            DebouncedEventKind::Any => {
-                info!("File changed: {}", event.path.display());
-            }
-            DebouncedEventKind::AnyContinuous => {
-                info!("File continuously changed: {}", event.path.display());
-            }
-            _ => {}
-        }
-        Ok(())
-    }
-    
-    fn handle_event_full(event: DebouncedEventFull) -> anyhow::Result<()> {
-        match event.kind {
-            notify::EventKind::Create(_) => {
-                for path in &event.paths {
-                    info!("Created: {}", path.display());
-                }
-            }
-            notify::EventKind::Modify(kind) => {
-                match kind {
-                    notify::event::ModifyKind::Data(_) => {
-                        for path in &event.paths {
-                            info!("Modified: {}", path.display());
-                        }
-                    }
-                    notify::event::ModifyKind::Name(_) => {
-                        for path in &event.paths {
-                            info!("Renamed: {}", path.display());
-                        }
-                    }
-                    _ => {}
-                }
-            }
-            notify::EventKind::Remove(_) => {
-                for path in &event.paths {
-                    info!("Removed: {}", path.display());
-                }
-            }
-            _ => {}
-        }
-        Ok(())
     }
     pub async fn watch_entry(self, detailed: bool) -> anyhow::Result<()> {
         if detailed {
@@ -138,6 +102,7 @@ impl Watcher {
         Ok(())
     }
 
+    #[allow(unused)]
     #[deprecated(since = "0.1.0", note = "Use watch_entry instead, maybe i can find a way to use it in the future")]
     pub async fn watch(self, _path: PathBuf) {
         std::thread::spawn(move || {

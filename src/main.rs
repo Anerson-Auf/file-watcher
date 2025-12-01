@@ -12,11 +12,13 @@ async fn main() -> Result<()> {
 
     let cli = Cli::prs();
     match cli.command {
-        Commands::Watch { path, detailed, recursive } => {
-            info!("Watching {} detailed: {}", path, detailed);
-            let watcher = Watcher::new(path, detailed).await?;
+        Commands::Watch { path, detailed, recursive: _ } => {
+            let path_trimmed = path.trim_matches('"').trim();
+            info!("Watching {} detailed: {}", path_trimmed, detailed);
+            let watcher = Watcher::new(path_trimmed.to_string(), detailed).await?;
             watcher.watch_entry(detailed).await?;
         }
+        // Maybe add other commands later
         _ => unreachable!("???")
     }
     info!("Exiting...");
