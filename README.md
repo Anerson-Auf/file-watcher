@@ -18,19 +18,28 @@ or
 
 ### Flags
 
-- `-d, --detailed` - Show detailed event types (Create, Modify, Remove)
+- `-d, --detailed` - Show detailed event types:
 - `-i, --ignore-list <file>` - Path to ignore patterns file (glob patterns, one per line)
+- `-f, --find-list <file>` - Path to find patterns file (only show events matching these glob patterns)
 - `-r, --recursive` - Currently unused (always recursive for directories)
 
-### Ignore Patterns
+### Ignore and Find Patterns
 
-Create a file with glob patterns (one per line) to ignore certain files:
+Create files with glob patterns (one per line):
 
+**Ignore patterns** (`-i`) - Exclude files matching these patterns:
 ```
 *.txt
 */name.json
 target/
 **/*.log
+```
+
+**Find patterns** (`-f`) - Only show events matching these patterns:
+```
+*.rs
+src/**/*.toml
+**/*.md
 ```
 
 ### Examples
@@ -48,8 +57,11 @@ cargo run watch -p ./src -d
 # Watch with ignore patterns
 cargo run watch -p ./src -i ignore.txt
 
+# Watch with find patterns (only show matching files)
+cargo run watch -p ./src -f find.txt
+
 # Combine flags
-cargo run watch -p ./src -d -i ignore.txt
+cargo run watch -p ./src -d -i ignore.txt -f find.txt
 ```
 
 ## Installation

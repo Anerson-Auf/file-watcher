@@ -26,6 +26,9 @@ pub enum Commands {
         /// Path to ignore list file.
         #[arg(short, long)]
         ignore_list: Option<String>,
+        /// Path to find list file.
+        #[arg(short, long)]
+        find_list: Option<String>,
         /// Not it's usefull for me, but it's here
         #[arg(short, long)]
         recursive: bool,

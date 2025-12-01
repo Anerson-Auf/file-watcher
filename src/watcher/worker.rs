@@ -6,7 +6,7 @@ use notify::{RecommendedWatcher};
 use std::sync::mpsc::Receiver;
 use tracing::{info, error};
 
-use crate::watcher::ignore::Ignore;
+use crate::watcher::filter::{Ignore, Filter};
 
 pub struct Watcher {
     _debouncer_mini: Option<Debouncer<ReadDirectoryChangesWatcher>>,
@@ -57,7 +57,7 @@ impl Watcher {
             })
         }
     }
-    pub async fn watch_entry(self, detailed: bool, ignore: Option<Ignore>) -> anyhow::Result<()> {
+    pub async fn watch_entry(self, detailed: bool, ignore: Option<Ignore>, find: Option<Filter>) -> anyhow::Result<()> {
         if detailed {
             let receiver = self.event_receiver_full.expect("Full receiver should exist");
             loop {
@@ -66,7 +66,7 @@ impl Watcher {
                         match result {
                             Ok(events) => {
                                 for event in events {
-                                    Watcher::handle_event_full(event, ignore.as_ref())?;
+                                    Watcher::handle_event_full(event, ignore.as_ref(), find.as_ref())?;
                                 }
                             }
                             Err(errors) => {
@@ -88,7 +88,7 @@ impl Watcher {
                 match receiver.recv() {
                     Ok(Ok(events)) => {
                         for event in events {
-                            Watcher::handle_event_mini(event, ignore.as_ref())?;
+                            Watcher::handle_event_mini(event, ignore.as_ref(), find.as_ref())?;
                         }
                     }
                     Ok(Err(e)) => {
