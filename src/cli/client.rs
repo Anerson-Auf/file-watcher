@@ -23,6 +23,9 @@ pub enum Commands {
         /// Detailed output of events.
         #[arg(short, long)]
         detailed: bool,
+        /// Path to ignore list file.
+        #[arg(short, long)]
+        ignore_list: Option<String>,
         /// Not it's usefull for me, but it's here
         #[arg(short, long)]
         recursive: bool,

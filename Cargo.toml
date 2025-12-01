@@ -7,6 +7,7 @@ edition = "2024"
 anyhow = "1.0.100"
 chrono = "0.4.42"
 clap = { version = "4.5.53", features = ["derive"] }
+globset = "0.4.18"
 metrics = "0.24.3"
 notify = "8.2.0"
 notify-debouncer-full = { version = "0.6.0", features = ["crossbeam-channel"] }
