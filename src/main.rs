@@ -13,7 +13,7 @@ async fn main() -> Result<()> {
     let cli = Cli::prs();
     match cli.command {
         Commands::Watch { path, detailed, recursive } => {
-            info!("Watching {} recursively: {}", path, recursive);
+            info!("Watching {} detailed: {}", path, detailed);
             let watcher = Watcher::new(path, detailed).await?;
             watcher.watch_entry(detailed).await?;
         }
