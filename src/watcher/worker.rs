@@ -9,8 +9,11 @@ use tracing::{info, error};
 use crate::watcher::filter::{Ignore, Filter};
 
 pub struct Watcher {
-    _debouncer_mini: Option<Debouncer<ReadDirectoryChangesWatcher>>,
+    _debouncer_mini: Option<Debouncer<RecommendedWatcher>>,
+    #[cfg(target_os = "windows")]
     _debouncer_full: Option<notify_debouncer_full::Debouncer<RecommendedWatcher, notify_debouncer_full::FileIdMap>>,
+    #[cfg(not(target_os = "windows"))]
+    _debouncer_full: Option<notify_debouncer_full::Debouncer<RecommendedWatcher, notify_debouncer_full::NoCache>>,
     event_receiver_mini: Option<Receiver<Result<Vec<DebouncedEventMini>>>>,
     event_receiver_full: Option<Receiver<DebounceEventResult>>,
 }
